@@ -1,0 +1,7 @@
+- name: Create SSH keypair
+  delegate_to: localhost
+  ansible.builtin.openssh_keypair:
+    type: ecdsa
+    size: 256
+    path: ~/.ssh/{{ bootstrap_ansible_user_name }}_ansible_ecdsa
+  register: ssh_key
