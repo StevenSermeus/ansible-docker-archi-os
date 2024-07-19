@@ -1,0 +1,26 @@
+version: "3.9"
+
+services:
+  quark:
+    container_name: quark
+    build:
+      context: .
+      dockerfile: quark.dockerfile
+    ports:
+      - "3000:8080"
+    volumes:
+      - ./assets/index.html:/var/www/html/index.html
+  reverse-proxy:
+    build:
+      context: .
+      dockerfile: reverse-proxy.dockerfile
+    volumes:
+      - ./assets/nginx.conf:/tmp/nginx.conf
+    ports:
+      - "81:81"
+    environment:
+      - PROXY_PASS=http://quark:8080
+      - PORT=81
+      - SERVER_NAME=localhost
+    depends_on:
+      - quark
