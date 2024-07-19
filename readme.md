@@ -1,5 +1,14 @@
 # Archi-os
 
+## Table of contents
+
+- [Configuration to get ansible running in a docker container](#configuration-to-get-ansible-running-in-a-docker-container)
+  - [Terminal setup](#terminal-setup)
+  - [Ansible setup](#ansible-setup)
+  - [Aliases](#aliases)
+  - [SSH configuration](#ssh-configuration)
+    - [SSH keys generation](#ssh-keys-generation)
+
 My ansible is running inside a docker container.
 
 ## Configuration to get ansible running in a docker container
