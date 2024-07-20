@@ -4,6 +4,7 @@
   hosts: 127.0.0.1
   connection: local
   # Generate key on local machine
+  # If running in docker this will generate the file than fail just relaunch the playbook with --skip-tags generate-ssh-key and it will work
   tasks:
     - name: Generated SSH key
       community.crypto.openssh_keypair:
