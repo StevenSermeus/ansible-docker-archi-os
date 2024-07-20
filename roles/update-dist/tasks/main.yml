@@ -1,0 +1,30 @@
+- name: Dist upgrade
+  tags: update-packages-dist-upgrade
+  block:
+    - name: Update all packages
+      ansible.builtin.apt:
+        upgrade: dist
+        update_cache: true
+        autoremove: true
+        autoclean: true
+      become: true
+      when: ansible_fact['os_family'] == 'Debian'
+
+    - name: Update all packages
+      tags: skip_ansible_lint
+      ansible.builtin.dnf:
+        name: "*"
+        state: latest
+        update_cache: true
+        autoremove: true
+      become: true
+      when: ansible_fact['os_family'] == 'RedHat'
+
+    - name: Update all packages
+      tags: skip_ansible_lint
+      ansible.builtin.pacman:
+        update_cache: true
+        upgrade: true
+        state: latest
+      become: true
+      when: ansible_fact['os_family'] == 'Archlinux'

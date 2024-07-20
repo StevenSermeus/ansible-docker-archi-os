@@ -1,0 +1,5 @@
+- name: MSMTP
+  hosts: all
+  roles:
+    - update-packages
+    - msmtp

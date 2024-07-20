@@ -1,47 +1,57 @@
-- name: Create user with sudo privileges
-  tags:
-    - bootstrap-ansible
-    - always
+- name: Create ansible user
+  tags: create-ansible-user
+  become: true
   block:
-    - name: Create user
+    - name: Create ansible user
       ansible.builtin.user:
         name: "{{ bootstrap_ansible_user_name }}"
-        shell: /bin/zsh
-        append: true
-        state: present
+        shell: /bin/bash
+        home: /home/{{ bootstrap_ansible_user_name }}
         createhome: true
-      when: ansible_user != 'root'
-    - name: Add user to sudoers
+
+    - name: Add ansible user to sudoers
       ansible.builtin.copy:
         content: "{{ bootstrap_ansible_user_name }} ALL=(ALL) NOPASSWD: ALL"
         dest: /etc/sudoers.d/{{ bootstrap_ansible_user_name }}
         owner: root
         group: root
         mode: "0440"
-      when: ansible_user != 'root'
+      become: true
 
-- name: Copy SSH key to user
+    - name: Create ssh directory
+      ansible.builtin.file:
+        path: /home/{{ bootstrap_ansible_user_name }}/.ssh
+        state: directory
+        owner: "{{ bootstrap_ansible_user_name }}"
+        group: "{{ bootstrap_ansible_user_name }}"
+        mode: "0700"
+
+- name: Copy SSH key
   tags:
-    - bootstrap-ansible
     - copy-ssh-key
-    - always
-  ansible.builtin.copy:
-    content: "{{ lookup('file', bootstrap_ansible_ssh_key_path) }}"
-    dest: "/home/{{ bootstrap_ansible_user_name }}/.ssh/authorized_keys"
-    owner: "{{ bootstrap_ansible_user_name }}"
-    group: "{{ bootstrap_ansible_user_name }}"
-    mode: "0600"
-  when: ansible_user != 'root'
-
-- name: Create SSH keypair and copy public key to user
-  tags:
-    - bootstrap-ansible
-    - always
+  become: true
   block:
-    - name: Create SSH keypair
-      delegate_to: localhost
-      ansible.builtin.openssh_keypair:
-        type: ecdsa
-        size: 256
-        path: ~/.ssh/{{ bootstrap_ansible_user_name }}_ansible_ecdsa
-      register: ssh_key
+    - name: Copy SSH key
+      ansible.posix.authorized_key:
+        user: "{{ bootstrap_ansible_user_name }}"
+        state: present
+        key: "{{ lookup('file', bootstrap_ansible_ssh_key_path) }}"
+
+- name: Edit sshd_config
+  tags: edit-sshd-config
+  become: true
+  notify:
+    - Restart SSH service
+  block:
+    - name: Edit sshd_config
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        line: "PasswordAuthentication no"
+        state: present
+        regexp: "^PasswordAuthentication"
+
+    - name: Edit /etc/ssh/sshd_config
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        line: "PermitRootLogin no"
+        state: present

@@ -1,8 +1,8 @@
 all:
   hosts:
     debian:
-      ansible_host: debian-ansible 
+      ansible_host: debian-steven
     fedora:
-      ansible_host: fedora-ansible
+      ansible_host: fedora-steven
     arch:
-      ansible_host: arch-ansible
+      ansible_host: arch-steven

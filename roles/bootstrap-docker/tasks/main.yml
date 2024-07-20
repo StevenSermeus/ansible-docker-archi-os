@@ -1,0 +1,21 @@
+- name: Install requiered packages
+  tags: install-docker-requiered-packages
+  block:
+    - name: Update packages
+      ansible.builtin.package:
+        name: "*"
+        update_cache: true
+        cache_valid_time: 3600
+        when: ansible_os_family == "Debian"
+
+- name: Install docker
+  tags: install-docker
+  notify: Start Docker
+  block:
+    - name: Install docker
+      ansible.builtin.package:
+        name: docker-ce
+        state: present
+        update_cache: true
+        cache_valid_time: 3600
+        when: ansible_os_family == "Debian"

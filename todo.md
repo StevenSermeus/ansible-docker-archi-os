@@ -11,6 +11,8 @@
 
 ## Ansible
 
+- [ ] Bootstrap ansible on all the servers
+- [ ] Bootstrap docker on all the servers
 - [ ] Glances on all the servers with password protected access
 - [ ] Deploy MSMTP on all the servers with configurable email address
 - [ ] Maybe one more thing with mariadb sambda but don't remember what

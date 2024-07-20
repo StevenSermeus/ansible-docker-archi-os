@@ -1,0 +1,22 @@
+- name: Generated ssh key
+  tags:
+    - generate-ssh-key
+  hosts: 127.0.0.1
+  connection: local
+  # Generate key on local machine
+  tasks:
+    - name: Generated SSH key
+      community.crypto.openssh_keypair:
+        path: "~/.ssh/ansible"
+        type: ed25519
+        state: present
+        owner: mew-docker
+        force: false
+
+- name: Bootstrap Ansible
+  hosts: all
+  roles:
+    - update-packages
+    - bootstrap-ansible
+  vars:
+    bootstrap_ansible_ssh_key_path: "~/.ssh/ansible.pub"

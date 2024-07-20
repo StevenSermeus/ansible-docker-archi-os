@@ -1,0 +1,5 @@
+- name: Glances
+  hosts: all
+  roles:
+    - update-packages
+    - glances

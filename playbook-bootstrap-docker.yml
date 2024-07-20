@@ -1,0 +1,5 @@
+- name: Bootstrap Docker
+  hosts: all
+  roles:
+    - update-packages
+    - bootstrap-docker

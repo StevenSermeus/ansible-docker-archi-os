@@ -1,0 +1,29 @@
+- name: Update packages
+  tags: update-packages
+  block:
+    - name: Update all packages (Debian)
+      tags: skip_ansible_lint
+      become: true
+      ansible.builtin.apt:
+        upgrade: full
+        update_cache: true
+        cache_valid_time: 3600
+      when: ansible_os_family == "Debian"
+
+    - name: Update all packages (RedHat)
+      tags: skip_ansible_lint
+      become: true
+      ansible.builtin.dnf:
+        name: "*"
+        state: latest
+        update_cache: true
+        cache_valid_time: 3600
+      when: ansible_os_family == "RedHat"
+
+    - name: Update all packages (ArchLinux)
+      tags: skip_ansible_lint
+      become: true
+      ansible.builtin.pacman:
+        update_cache: true
+        upgrade: full
+      when: ansible_os_family == "ArchLinux"

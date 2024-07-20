@@ -1,0 +1,7 @@
+bootstrap_docker_required_packages:
+  - Debian:
+      - apt-transport-https
+  - RedHat:
+      - yum-utils
+  - ArchLinux:
+      - curl

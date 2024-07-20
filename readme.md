@@ -86,7 +86,8 @@ ENV DOCKERIZED=true
 
 # Install zsh plugins with zinit
 ENV TERM=xterm-256color
-RUN echo 'source ~/.zshrc' | zsh
+RUN zsh -c "echo 'source ~/.zshrc' > /tmp/source-zshrc.sh && chmod +x /tmp/source-zshrc.sh"
+RUN zsh /tmp/source-zshrc.sh || cat /home/mew-docker/.zshrc
 
 CMD ["/bin/zsh"]
 ```
