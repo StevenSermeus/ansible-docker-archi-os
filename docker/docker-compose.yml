@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   quark:
     container_name: quark
@@ -10,13 +8,6 @@ services:
       - "3000:8080"
     volumes:
       - ./assets/index.html:/var/www/html/index.html
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080"]
-      interval: 1m30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-
   reverse-proxy:
     build:
       context: .
@@ -30,5 +21,4 @@ services:
       - PORT=81
       - SERVER_NAME=localhost
     depends_on:
-      quark:
-        condition: service_healthy
+      - quark

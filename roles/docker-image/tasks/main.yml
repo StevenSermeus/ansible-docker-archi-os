@@ -8,6 +8,7 @@
       tags:
         - docker
         - copy-docker-folder
+        - pre-run
       ansible.builtin.copy:
         src: "{{ docker_image_docker_folder }}"
         dest: "{{ docker_image_docker_folder_remote }}/"
@@ -19,6 +20,7 @@
       tags:
         - docker
         - build-docker-image
+        - pre-run
       community.general.docker_image:
         name: "{{ docker_image_name }}"
         build:
@@ -31,7 +33,7 @@
       community.general.docker_container:
         name: "{{ docker_image_container_name }}"
         image: "{{ docker_image_name }}"
-        state: started
+        state: "{{ docker_image_state }}"
         volumes: "{{ docker_image_container_volumes }}"
         ports: "{{ docker_image_container_ports }}"
         env: "{{ docker_image_container_env }}"

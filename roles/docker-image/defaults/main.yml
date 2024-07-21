@@ -8,3 +8,4 @@ docker_image_container_env:
 docker_image_docker_folder: "docker"
 docker_image_docker_file: "Dockerfile"
 docker_image_docker_folder_remote: "/srv"
+docker_image_stage: "present"

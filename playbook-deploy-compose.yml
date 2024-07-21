@@ -1,0 +1,27 @@
+- name: Deploy Docker compose project
+  hosts: debian
+  vars:
+    docker_compose_folder: "docker"
+    docker_compose_folder_remote: "/srv"
+    ansible_user: "ansible"
+  become: true
+  tasks:
+    - name: Copy Docker compose folder
+      tags:
+        - docker
+        - copy-docker-compose-folder
+      ansible.builtin.copy:
+        src: "{{ docker_compose_folder }}"
+        dest: "{{ docker_compose_folder_remote }}/"
+        force: true
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: "0644"
+    - name: Run Docker compose
+      tags:
+        - docker
+        - deploy-docker-compose
+        - ansible-lint-skip
+      community.docker.docker_compose_v2:
+        project_src: "{{ docker_compose_folder_remote }}/{{ docker_compose_folder }}"
+        state: present

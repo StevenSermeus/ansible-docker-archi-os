@@ -15,3 +15,4 @@
         docker_image_container_ports:
           - "8080:8080"
         ansible_user: "ansible"
+        docker_image_state: "absent"
