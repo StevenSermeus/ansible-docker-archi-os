@@ -1,21 +1,193 @@
-- name: Install requiered packages
-  tags: install-docker-requiered-packages
-  block:
-    - name: Update packages
-      ansible.builtin.package:
-        name: "*"
-        update_cache: true
-        cache_valid_time: 3600
-        when: ansible_os_family == "Debian"
+- name: Uninstall old versions
+  tags:
+    - docker
+    - remove-old-docker
+  become: true
+  ansible.builtin.package:
+    name: "{{ item }}"
+    state: absent
+  with_items:
+    - docker
+    - docker-engine
+    - docker.io
+    - containerd
+    - runc
 
-- name: Install docker
-  tags: install-docker
-  notify: Start Docker
+- name: Install Docker dependencies
+  tags:
+    - docker
+    - install-docker-dependencies
+  become: true
   block:
-    - name: Install docker
-      ansible.builtin.package:
-        name: docker-ce
+    - name: Install dependencies (Debian)
+      ansible.builtin.apt:
+        name: "{{ item }}"
         state: present
+      with_items:
+        - ca-certificates
+        - curl
+        - gnupg
+      when: ansible_facts['os_family'] == "Debian"
+
+- name: Set architecture specific variables
+  ansible.builtin.set_fact:
+    arch: "{{ 'arm64' if ansible_architecture == 'aarch64' else 'amd64' }}"
+
+- name: Install Docker for Debian
+  tags:
+    - docker
+    - install-docker-debian
+  become: true
+  when: ansible_facts['os_family'] == "Debian"
+  block:
+    - name: Create directory for keyrings (Debian)
+      ansible.builtin.file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: "0755"
+
+    - name: Add Docker GPG key (Debian)
+      ansible.builtin.apt_key:
+        url: https://download.docker.com/linux/debian/gpg
+        state: present
+
+    - name: Add Docker GPG key to the keyrings directory (Debian)
+      ansible.builtin.get_url:
+        url: https://download.docker.com/linux/debian/gpg
+        dest: /etc/apt/keyrings/docker.asc
+        mode: "0644"
+
+    - name: Add repository into sources list (Debian)
+      ansible.builtin.apt_repository:
+        repo: "deb [arch={{ arch }} signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable"
+        state: present
+        filename: docker
+
+    - name: Update apt cache
+      ansible.builtin.apt:
         update_cache: true
-        cache_valid_time: 3600
-        when: ansible_os_family == "Debian"
+
+    - name: Install docker (Debian)
+      ansible.builtin.apt:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - docker-ce
+        - docker-ce-cli
+        - containerd.io
+        - docker-buildx-plugin
+        - docker-compose-plugin
+
+- name: Install Docker for Fedora
+  tags:
+    - docker
+    - install-docker-fedora
+  become: true
+  when: ansible_facts['os_family'] == "RedHat"
+  block:
+    - name: Install dnf plugins core
+      ansible.builtin.dnf:
+        name: dnf-plugins-core
+        state: present
+
+    - name: Add Docker repo
+      ansible.builtin.yum_repository:
+        name: Docker
+        description: Docker repository
+        baseurl: https://download.docker.com/linux/fedora/$releasever/$basearch/stable
+        gpgcheck: true
+
+    - name: Add Docker GPG key
+      ansible.builtin.rpm_key:
+        state: present
+        key: https://download.docker.com/linux/fedora/gpg
+
+    - name: Update dnf cache
+      ansible.builtin.dnf:
+        update_cache: true
+
+    - name: Install docker (Fedora)
+      ansible.builtin.dnf:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - docker-ce
+        - docker-ce-cli
+        - containerd.io
+        - docker-buildx-plugin
+        - docker-compose-plugin
+
+    - name: Load ip_tables module
+      ansible.builtin.modprobe:
+        name: ip_tables
+        state: present
+      when: ansible_facts['os_family'] == "RedHat"
+
+- name: Install Docker for Archlinux
+  tags:
+    - docker
+    - install-docker-archlinux
+  become: true
+  when: ansible_facts['os_family'] == "Archlinux"
+  block:
+    - name: Install docker (Archlinux)
+      ansible.builtin.pacman:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - python-setuptools
+        - python-pip
+        - python-requests
+        - docker
+        - docker-compose
+        - iptables
+        - linux-headers
+        - linux
+        - fuse-overlayfs
+        - bridge-utils
+
+    - name: Load module
+      ansible.builtin.modprobe:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - overlay
+        - br_netfilter
+  # If the block fails, reboot the server
+  rescue:
+    - name: Reboot server on failure
+      ansible.builtin.reboot:
+        reboot_timeout: 600
+
+    - name: Wait for the server to come back online
+      ansible.builtin.wait_for_connection:
+        timeout: 600
+
+    - name: Load kernel modulemodule
+      become: true
+      ansible.builtin.modprobe:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - overlay
+        - br_netfilter
+
+- name: Start and enable Docker service
+  tags:
+    - docker
+    - start-docker
+  become: true
+  ansible.builtin.systemd:
+    name: docker
+    enabled: true
+    state: started
+
+- name: Deploy hello-world container
+  become: true
+  tags:
+    - docker
+    - deploy-hello-world
+  docker_container:
+    name: hello-world
+    image: hello-world
+    state: started

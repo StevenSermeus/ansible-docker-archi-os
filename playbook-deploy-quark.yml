@@ -1,0 +1,17 @@
+- name: Include role docker-image
+  hosts: debian
+  tasks:
+    - name: Include role docker-image
+      ansible.builtin.include_role:
+        name: docker-image
+      vars:
+        docker_image_name: "quark"
+        docker_image_tag: "latest"
+        docker_image_container_name: "quark"
+        docker_image_docker_folder: "docker"
+        docker_image_docker_file: "quark.dockerfile"
+        docker_image_container_volumes:
+          - "./assets/index.html:/var/www/html/index.html"
+        docker_image_container_ports:
+          - "8080:8080"
+        ansible_user: "ansible"

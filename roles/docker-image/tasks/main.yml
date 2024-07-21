@@ -1,0 +1,37 @@
+- name: Deploy docker based on Dockerfile
+  become: true
+  tags:
+    - docker
+    - deploy-docker-image
+  block:
+    - name: Copy Docker folder
+      tags:
+        - docker
+        - copy-docker-folder
+      ansible.builtin.copy:
+        src: "{{ docker_image_docker_folder }}"
+        dest: "{{ docker_image_docker_folder_remote }}/"
+        force: true
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: "0644"
+    - name: Build Docker image
+      tags:
+        - docker
+        - build-docker-image
+      community.general.docker_image:
+        name: "{{ docker_image_name }}"
+        build:
+          pull: true
+          path: "{{ docker_image_docker_folder_remote }}/{{ docker_image_docker_folder }}"
+          dockerfile: "{{ docker_image_docker_folder_remote }}/{{ docker_image_docker_folder }}/{{ docker_image_docker_file }}"
+        source: build
+        state: present
+    - name: Run Docker container
+      community.general.docker_container:
+        name: "{{ docker_image_container_name }}"
+        image: "{{ docker_image_name }}"
+        state: started
+        volumes: "{{ docker_image_container_volumes }}"
+        ports: "{{ docker_image_container_ports }}"
+        env: "{{ docker_image_container_env }}"

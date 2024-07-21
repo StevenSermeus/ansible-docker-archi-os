@@ -1,0 +1,10 @@
+dcoker_image_name: "Hello-World"
+dcoker_image_tag: "latest"
+docker_image_container_name: "Hello-World"
+docker_image_container_volumes: []
+docker_image_container_ports: []
+docker_image_container_env:
+  ansible_deployed: "true"
+docker_image_docker_folder: "docker"
+docker_image_docker_file: "Dockerfile"
+docker_image_docker_folder_remote: "/srv"
