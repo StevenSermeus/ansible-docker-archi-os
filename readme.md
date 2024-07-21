@@ -198,3 +198,7 @@ You can copy the public key to the remote host with the ssh-copy-id command. You
 # You can replace the ip-address with the ip address of the remote host and the steven with the user of the remote host and the ansible-steven with the path to the ssh key
 ssh-copy-id -i ~/.ssh/ansible-steven steven@ip-address
 ```
+
+## For more information on the playbook look the ansible.md file
+
+## Same for docker readme.md in the docker folder
