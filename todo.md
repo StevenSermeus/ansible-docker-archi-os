@@ -11,13 +11,13 @@
 
 ## Ansible
 
-- [ ] Bootstrap ansible on all the servers
-- [ ] Bootstrap docker on all the servers
+- [x] Bootstrap ansible on all the servers
+- [x] Bootstrap docker on all the servers
 - [ ] Glances on all the servers with password protected access
 - [ ] Deploy MSMTP on all the servers with configurable email address
-- [ ] Maybe one more thing with mariadb sambda but don't remember what
+- [ ] Deploy LAMP stack on all the servers Linux, Apache, MariaDB, PHP on all the servers
 
 ## Ansible + docker
 
-- [ ] Deploy the web server and the reverse proxy with ansible using docker compose
-- [ ] Deploy only the image of the web server and use a nginx or apache reverse proxy installed by package manager on the host machine of choice
+- [x] Deploy the web server and the reverse proxy with ansible using docker compose
+- [x] Deploy only the image of the web server and use a nginx or apache reverse proxy installed by package manager on the host machine of choice
