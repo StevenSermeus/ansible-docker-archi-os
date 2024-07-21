@@ -6,3 +6,9 @@ msmtp_accounts:
     password: "app password from gmail"
     msmtp_server: gmail
     default: true
+  # - name: "Steven2"
+  #   email: "dqsdqs@gmail.com"
+  #   user: "dqsdqs"
+  #   password: "app password from gmail"
+  #   msmtp_server: gmail
+  #   default: false
