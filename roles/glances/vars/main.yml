@@ -17,3 +17,5 @@ glances_bin:
   RedHat: "/usr/local/bin/glances"
   Debian: "/usr/bin/python3 -m glances"
   Archlinux: "/usr/bin/glances"
+
+glances_port: 61208
