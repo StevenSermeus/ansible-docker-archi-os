@@ -1,7 +1,29 @@
 - name: MSMTP
   hosts: all
+  tags:
+    - msmtp-all-same-mail
   vars_files:
     - /home/mew-docker/workdir/server_config.yml
+  roles:
+    - update-packages
+    - msmtp
+
+- name: MSMTP Debian
+  hosts: debian
+  tags:
+    - msmtp-debian
+  vars_files:
+    - /home/mew-docker/workdir/server_config_debian.yml
+  roles:
+    - update-packages
+    - msmtp
+
+- name: MSMTP Archlinux
+  hosts: archlinux
+  tags:
+    - msmtp-archlinux
+  vars_files:
+    - /home/mew-docker/workdir/server_config_arch.yml
   roles:
     - update-packages
     - msmtp
