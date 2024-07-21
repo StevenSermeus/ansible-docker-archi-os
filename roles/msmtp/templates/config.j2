@@ -1,0 +1,23 @@
+defaults
+auth           on
+tls            on
+tls_starttls   on
+tls_trust_file /etc/ssl/certs/ca-certificates.crt
+
+
+{% for account in msmtp_accounts %}
+# Account {{ account.name }}
+account {{ account.name }}
+host {{ msmtp_server[account.msmtp_server].host }}
+port {{ msmtp_server[account.msmtp_server].port }}
+{% if msmtp_server[account.msmtp_server].auth is defined %}
+auth {{ msmtp_server[account.msmtp_server].auth }}
+{% endif %}
+from {{ account.email }}
+user {{ account.user }}
+password {{ account.password }}
+{% if account.default %}
+account default : {{ account.name }}
+
+{% endif %}
+{% endfor %}

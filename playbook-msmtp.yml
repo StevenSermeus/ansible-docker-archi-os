@@ -1,5 +1,7 @@
 - name: MSMTP
   hosts: all
+  vars_files:
+    - /home/mew-docker/workdir/server_config.yml
   roles:
     - update-packages
     - msmtp

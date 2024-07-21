@@ -13,8 +13,9 @@
 
 - [x] Bootstrap ansible on all the servers
 - [x] Bootstrap docker on all the servers
-- [ ] Glances on all the servers with password protected access
-- [ ] Deploy MSMTP on all the servers with configurable email address
+- [x] Glances on all the servers
+- [ ] Protect glances with password (Bonus not done in course)
+- [x] Deploy MSMTP on all the servers with configurable email address
 - [ ] Deploy LAMP stack on all the servers Linux, Apache, MariaDB, PHP on all the servers
 
 ## Ansible + docker

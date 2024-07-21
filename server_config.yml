@@ -1,0 +1,8 @@
+# When adding password to this file make sure to encrypt it using ansible-vault encrypt server_config.yml
+msmtp_accounts:
+  - name: "Steven"
+    email: "testansiblemsmpt@gmail.com"
+    user: "testansiblemsmpt"
+    password: "app password from gmail"
+    msmtp_server: gmail
+    default: true
