@@ -1,0 +1,9 @@
+[Unit]
+Description = Glances in Web Server Mode
+After = network.target
+
+[Service]
+ExecStart = {{ glances_bin[ansible_os_family] }} -w
+
+[Install]
+WantedBy = multi-user.target

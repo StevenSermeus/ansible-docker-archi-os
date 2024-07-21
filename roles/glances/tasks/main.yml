@@ -1,0 +1,67 @@
+- name: Install Glances requiered package
+  become: true
+  tags:
+    - glances-requiered-packages
+  block:
+    - name: Install requiered package
+      ansible.builtin.package:
+        name: "{{ item }}"
+        state: present
+      loop: "{{ glances_requiered_packages[ansible_os_family] }}"
+
+- name: Install Glances
+  become: true
+  tags:
+    - glances
+    - glances-install
+  block:
+    - name: Install Glances Archlinux
+      ansible.builtin.package:
+        name: "glances"
+        state: present
+      when: ansible_os_family == "Archlinux"
+
+    - name: Install Glances Debian
+      ansible.builtin.pip:
+        name: "glances[all]"
+        state: present
+        extra_args: --user --break-system-packages
+      when: ansible_os_family == "Debian"
+
+    - name: Install Glances RedHat
+      ansible.builtin.pip:
+        name:
+          - glances[all]
+          - bottle
+        state: present
+        extra_args: --use-pep517
+      when: ansible_os_family == "RedHat"
+
+- name: Config and enable glances services
+  become: true
+  tags:
+    - glances
+    - glances-service
+  block:
+    - name: Create glances service
+      ansible.builtin.template:
+        src: glances.service.j2
+        dest: "/etc/systemd/system/glances.service"
+        owner: root
+        group: root
+        mode: "0644"
+    - name: Reload systemd
+      ansible.builtin.systemd:
+        daemon_reload: true
+    - name: Enable glances service
+      ansible.builtin.systemd:
+        name: glances
+        enabled: true
+        state: started
+    - name: Allow port on fedora
+      ansible.builtin.firewalld:
+        port: "{{ glances_port }}/tcp"
+        permanent: true
+        state: enabled
+        immediate: true
+      when: ansible_os_family == "RedHat"

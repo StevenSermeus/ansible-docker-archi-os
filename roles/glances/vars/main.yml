@@ -1,0 +1,19 @@
+glances_requiered_packages:
+  RedHat:
+    - python3-pip
+    - python3-devel
+    - gcc
+  Debian:
+    - python3-pip
+    - python3-dev
+  Archlinux:
+    - python-bottle
+    - python-fastapi
+    - uvicorn
+    - python-orjson
+    - python-jinja
+
+glances_bin:
+  RedHat: "/usr/local/bin/glances"
+  Debian: "/usr/bin/python3 -m glances"
+  Archlinux: "/usr/bin/glances"
