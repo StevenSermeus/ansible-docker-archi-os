@@ -1,0 +1,87 @@
+- name: Install all services (LAMP)
+  become: true
+  tags:
+    - lamp
+    - lamp-install
+  block:
+    - name: Install all
+      ansible.builtin.package:
+        name: "{{ item }}"
+        state: present
+      loop: "{{ lamp_packages[ansible_os_family] }}"
+
+- name: Config and enable all services (LAMP)
+  become: true
+  tags:
+    - lamp
+    - lamp-config
+  block:
+    - name: Configure all services
+      ansible.builtin.command:
+        cmd: "mariadb-install-db --user=mysql --basedir=/usr --datadir=/var/lib/mysql"
+        creates: "/var/lib/mysql/mysql"
+
+    - name: Create samba folder
+      ansible.builtin.file:
+        path: /samba
+        state: directory
+        mode: "0777"
+
+    - name: Create Samba configuration file
+      ansible.builtin.copy:
+        src: smb.conf
+        dest: /etc/samba/smb.conf
+        mode: "0644"
+
+    - name: Open port 80 on fedora
+      ansible.builtin.firewalld:
+        service: http
+        permanent: true
+        state: enabled
+        immediate: true
+      when: ansible_os_family == "RedHat"
+
+    - name: Configure apache for arch
+      when: ansible_os_family == "Archlinux"
+      block:
+        - name: Enable PHP module in Apache
+          ansible.builtin.lineinfile:
+            path: /etc/httpd/conf/httpd.conf
+            regexp: "^#LoadModule php_module modules/libphp.so"
+            line: "LoadModule php_module modules/libphp.so"
+
+        - name: Comment out current MPM module
+          ansible.builtin.lineinfile:
+            path: /etc/httpd/conf/httpd.conf
+            regexp: "^LoadModule mpm_.*_module modules/mod_mpm_.*.so"
+            line: "#LoadModule mpm_event_module modules/mod_mpm_event.so"
+
+        - name: Enable prefork MPM module
+          ansible.builtin.lineinfile:
+            path: /etc/httpd/conf/httpd.conf
+            regexp: "^#LoadModule mpm_prefork_module modules/mod_mpm_prefork.so"
+            line: "LoadModule mpm_prefork_module modules/mod_mpm_prefork.so"
+
+        - name: Add PHP handler in Apache configuration
+          ansible.builtin.lineinfile:
+            path: /etc/httpd/conf/httpd.conf
+            line: "AddHandler php-script .php"
+            state: present
+
+        - name: Include extra php module
+          ansible.builtin.lineinfile:
+            path: /etc/httpd/conf/httpd.conf
+            line: "Include conf/extra/php_module.conf"
+
+- name: Start and enable all services
+  become: true
+  tags:
+    - lamp
+    - lamp-service
+  block:
+    - name: Start and enable all services
+      ansible.builtin.service:
+        name: "{{ item }}"
+        enabled: true
+        state: started
+      loop: "{{ lamp_services[ansible_os_family] }}"

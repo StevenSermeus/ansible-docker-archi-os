@@ -1,0 +1,33 @@
+lamp_packages:
+  Debian:
+    - apache2
+    - samba
+    - mariadb-server
+    - php
+  Archlinux:
+    - apache
+    - samba
+    - mariadb
+    - php
+    - php-apache
+
+  RedHat:
+    - httpd
+    - samba
+    - mariadb-server
+    - php
+
+lamp_services:
+  Debian:
+    - apache2
+    - smbd
+    - mariadb
+
+  Archlinux:
+    - httpd
+    - smb
+    - mariadb
+  RedHat:
+    - httpd
+    - smb
+    - mariadb

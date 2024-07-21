@@ -1,0 +1,5 @@
+- name: Lamp Stack deploy
+  hosts: all
+  roles:
+    - update-packages
+    - lamp
